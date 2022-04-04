@@ -53,12 +53,12 @@ export default class BookmarkDao implements BookMarkDaoI {
      * @param {string} tid Tuit's primary key
      */
     findOneBookmark = async (uid: string, tid: string): Promise<any> =>
-        BookmarkModel.findOne({bookmarkedBy: uid, bookmarkedTuit: tid})
-            .populate("bookmarkedBy")
-            .populate("bookmarkedTuit")
+        BookmarkModel.find({bookmarkedBy: uid, bookmarkedTuit: tid})
+            .populate({
+                path: "bookmarkedTuit",
+                populate: {
+                    path: "bookmarkedBy"
+                }
+            })
             .exec();
-
-
-
-
 }
