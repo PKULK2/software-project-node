@@ -41,9 +41,24 @@ export default class FollowController implements FollowControllerI {
      * @param res {Response} represents response to client, including the body formatted
      * as JSON containing the new follow that was inserted in the database
      */
-    createFollow = (req: Request, res: Response) =>
-        this.followDao.createFollow(req.params.uid, req.params.fuid)
-            .then(follows => res.json(follows));
+    createFollow = async (req: any, res: any) => {
+        const uid = req.params.uid;
+        const fuid = req.params.fuid;
+        const profile = req.session['profile'];
+        const userId = uid === "me" && profile ?
+            profile._id : uid;
+        const existentFollow = await this.followDao.findOneFollow(uid, fuid);
+        try {
+            if (!existentFollow) {
+                this.followDao.createFollow(uid, fuid)
+                    .then(follows => res.json(follows));
+            }
+            res.sendStatus(200);
+        }
+        catch (e) {
+            res.sendStatus(404)
+        }
+    }
     /**
      * Deletes a follow object that contains the follower, following relation between two users
      * @param req {Request} req Represents request from client, including path

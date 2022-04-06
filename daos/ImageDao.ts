@@ -6,18 +6,6 @@ import ImageDaoI from "../interfaces/imageDao";
 import ImageModel from "../mongoose/image/ImageModel";
 import Image from "../models/image/Image";
 
-//module for storing uploaded files
-const multer = require('multer');
-const storage = multer.diskStorage({
-    destination: (req: any, file: any, cb: any) => {
-        cb(null, 'uploads')
-    },
-    filename: (req: any, file: any, cb: any) => {
-        cb(null, file.fieldname + '-' + Date.now())
-    }
-});
-const upload = multer({ storage: storage });
-
 /**
  * @class ImageDao Implements Data Access Object managing data storage
  * of Images
@@ -29,7 +17,7 @@ export default class ImageDao implements ImageDaoI {
      * @returns Promise To be notified when the message is inserted in the
      * database
      */
-    createImage = async (uid: string, ruid: string, image: Image): Promise<Image> =>
+    createImage = async (uid: string, ruid: string, image: any): Promise<Image> =>
         ImageModel.create({sender: uid, receiver: ruid, image: image});
 
     /**
@@ -42,6 +30,7 @@ export default class ImageDao implements ImageDaoI {
     deleteImage =  async (uid: string, ruid: string, iid: string): Promise<any> =>
         ImageModel.deleteOne({sender: uid, receiver: ruid, _id: iid});
 
+    // @ts-ignore
     /**
      * MessageModel to retrieve all messages sent by this user
      * @param {string} uid User's primary key
@@ -51,6 +40,7 @@ export default class ImageDao implements ImageDaoI {
         ImageModel.find({sender: uid})
             .sort({'postedOn': -1})
             .populate("receiver")
+            .lean()
             .exec();
 
     /**
@@ -61,6 +51,7 @@ export default class ImageDao implements ImageDaoI {
     findImagesToUser = async (uid: string): Promise<Image[]> =>
         ImageModel.find({receiver: uid})
             .sort({'postedOn': -1})
+            .lean()
             .populate("sender")
             .exec();
 
@@ -72,6 +63,7 @@ export default class ImageDao implements ImageDaoI {
         ImageModel.find()
             .populate("sender")
             .populate("receiver")
+            .lean()
             .exec();
 
 }
