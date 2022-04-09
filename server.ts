@@ -20,11 +20,13 @@ import ImageController from "./controllers/ImageController";
 import mongoose from "mongoose";
 import FollowDao from "./daos/FollowDao";
 import FollowController from "./controllers/FollowController";
+import AuthenticationController from "./controllers/AuthenticationController";
 const cors = require('cors')
 const session = require("express-session");
 const multer = require('multer');
 
 // build the connection string
+/*
 const PROTOCOL = "mongodb+srv";
 const DB_USERNAME = process.env.DB_USERNAME;
 const DB_PASSWORD = process.env.DB_PASSWORD;
@@ -33,9 +35,12 @@ const DB_NAME = "myFirstDatabase";
 const DB_QUERY = "retryWrites=true&w=majority";
 const connectionString = `${PROTOCOL}://${DB_USERNAME}:${DB_PASSWORD}@${HOST}/${DB_NAME}?${DB_QUERY}`;
 const connection = "mongodb+srv://software-engineering:softwareSpring2022@cluster0.exbec.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+*/
 
 // connect to the database
-mongoose.connect(connection);
+//mongoose.connect(connection);
+mongoose.connect('mongodb://localhost:27017/Tuiter');
+
 
 //express instance
 const app = express();
@@ -85,6 +90,7 @@ const imageDao = new ImageDao();
 const followDao = new FollowDao();
 const followController = new FollowController(app, followDao);
 const imageController = new ImageController(app, imageDao, followDao, upload);
+AuthenticationController(app);
 
 
 /**
