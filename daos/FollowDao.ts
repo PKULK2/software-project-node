@@ -17,7 +17,7 @@ export default class FollowDao implements FollowDaoI {
      * @returns Promise To be notified when the follow is inserted in the
      * database
      */
-    createFollow = async (uid: string, following: string): Promise<Follow> =>
+    createFollow = async (uid: string, following: string): Promise<any> =>
         FollowModel.create({user: uid, following: following});
 
     /**
@@ -55,7 +55,12 @@ export default class FollowDao implements FollowDaoI {
      */
     findAllUsersThisUserFollows = async (uid: string): Promise<Follow[]> =>
         FollowModel.find({user: uid})
-            .populate("following")
+            .populate({
+                path: "user",
+                populate : {
+                    path: "username"
+                }
+            })
             .exec();
 
     /**
@@ -65,7 +70,12 @@ export default class FollowDao implements FollowDaoI {
      */
     findOneFollow = async (uid: string, follow: string): Promise<any> =>
         FollowModel.findOne({user: uid, following: follow})
-            .populate("following")
+            .populate({
+                path: "user",
+                populate : {
+                    path: "username"
+                }
+            })
             .exec();
 
 }
