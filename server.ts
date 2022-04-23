@@ -21,6 +21,8 @@ import mongoose from "mongoose";
 import FollowDao from "./daos/FollowDao";
 import FollowController from "./controllers/FollowController";
 import AuthenticationController from "./controllers/AuthenticationController";
+import BookmarkController from "./controllers/BookmarkController";
+import BookmarkDao from "./daos/BookmarkDao";
 const cors = require('cors')
 const session = require("express-session");
 const multer = require('multer');
@@ -39,7 +41,9 @@ const connection = "mongodb+srv://software-engineering:softwareSpring2022@cluste
 
 // connect to the database
 //mongoose.connect(connection);
-mongoose.connect('mongodb://localhost:27017/Tuiter');
+//mongoose.connect('mongodb://localhost:27017/Tuiter');
+mongoose.connect('mongodb+srv://PPK2000:Poorna-2000@cluster0.1murc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority');
+
 
 
 //express instance
@@ -86,6 +90,8 @@ const courseController = new CourseController(app);
 const userController = UserController.getInstance(app);
 const tuitController = TuitController.getInstance(app);
 const likesController = LikeController.getInstance(app);
+const bookmarkDao = new BookmarkDao();
+const bookmarkController = new BookmarkController(app,bookmarkDao);
 const imageDao = new ImageDao();
 const followDao = new FollowDao();
 const followController = new FollowController(app, followDao);
