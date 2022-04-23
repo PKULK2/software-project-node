@@ -3,6 +3,6 @@ import User from "../users/User";
 export default interface Image {
     sender: User,
     receiver: User,
-    image: any
+    image: string
     sentOn?: Date
 }

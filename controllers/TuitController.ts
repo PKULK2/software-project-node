@@ -79,11 +79,6 @@ export default class TuitController implements TuitControllerI {
             .then((tuits: Tuit[]) => res.json(tuits));
     }
 
-    /* findAllTuitsByUser = (req: Request, res: Response) =>
-        TuitController.tuitDao.findAllTuitsByUser(req.params.uid)
-            .then((tuits: Tuit[]) => res.json(tuits));
-    */
-
     /**
      * @param {Request} req Represents request from client, including path
      * parameter tid identifying the primary key of the tuit to be retrieved
@@ -114,6 +109,11 @@ export default class TuitController implements TuitControllerI {
 
         //console.log(userId);
 
+    createTuitByUser = (req: any, res: any) => {
+        let userId = req.params.uid === "my"
+        && req.session['profile'] ?
+            req.session['profile']._id :
+            req.params.uid;
         TuitController.tuitDao.createTuitByUser(userId, req.body)
             .then((tuit: Tuit) => res.json(tuit));
     }

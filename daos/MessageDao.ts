@@ -17,7 +17,7 @@ export default class MessageDao implements MessageDaoI {
      * @returns Promise To be notified when the message is inserted in the
      * database
      */
-    createMessage = async (uid: string, ruid: string, message: Message): Promise<Message> =>
+    createMessage = async (uid: string, ruid: string, message: Message): Promise<any> =>
         MessageModel.create({sender: uid, receiver: ruid, message: message});
 
     /**
@@ -33,24 +33,44 @@ export default class MessageDao implements MessageDaoI {
     /**
      * MessageModel to retrieve all messages sent by this user
      * @param {string} uid User's primary key
+     * @param {string} ruid Receiver's primary key
      * @returns Promise to be notified when the messages are retrieve from database
      */
-    findMessagesByUser = async (uid: string): Promise<Message[]> =>
-        MessageModel.find({sender: uid})
+    findMessagesByUser = async (uid: string, ruid: string): Promise<Message[]> => {
+        console.log("THIS IS FROM THE MESSAGE By USER")
+        console.log("UID")
+        console.log(uid)
+        console.log("RUID")
+        console.log(ruid)
+        return MessageModel.find({sender: ruid, receiver: uid})
             .sort({'postedOn': -1})
-            .populate("receiver")
+            .populate({
+                path: "sender",
+                select: "username"
+            })
             .exec();
+    }
 
     /**
      * MessageModel to retrieve all messages sent to this user
      * @param {string} uid User's primary key
+     * @param {string} ruid Receiver's primary key
      * @returns Promise to be notified when the messages are retrieve from database
      */
-    findMessagesToUser = async (uid: string): Promise<Message[]> =>
-        MessageModel.find({receiver: uid})
+    findMessagesToUser = async (uid: string, ruid: string): Promise<Message[]> => {
+        console.log("THIS IS FROM THE MESSAGE TO USER")
+        console.log("UID")
+        console.log(uid)
+        console.log("RUID")
+        console.log(ruid)
+        return MessageModel.find({receiver: ruid, sender: uid})
             .sort({'postedOn': -1})
-            .populate("sender")
+            .populate({
+                path: "receiver",
+                select: "username"
+            })
             .exec();
+    }
 
     /**
      * MessageModel to update a messages this user sent
