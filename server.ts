@@ -6,7 +6,7 @@
  *     <li>tuits</li>
  *     <li>likes</li>
  * </ul>
- * 
+ *
  * Connects to a remote MongoDB instance hosted on the Atlas cloud database
  * service
  */
@@ -26,6 +26,8 @@ import LikeDao from "./daos/LikeDao";
 import TuitDao from "./daos/TuitDao";
 import MessageDao from "./daos/MessageDao";
 import MessageController from "./controllers/MessageController";
+import BookmarkController from "./controllers/BookmarkController";
+import BookmarkDao from "./daos/BookmarkDao";
 const cors = require('cors')
 const session = require("express-session");
 
@@ -42,8 +44,15 @@ const connection = "mongodb+srv://software-engineering:softwareSpring2022@cluste
 
 
 // connect to the database
+
 mongoose.connect(connection);
 //mongoose.connect('mongodb://localhost:27017/Tuiter');
+//mongoose.connect(connection);
+//mongoose.connect('mongodb://localhost:27017/Tuiter');
+mongoose.connect('mongodb+srv://PPK2000:Poorna-2000@cluster0.1murc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority');
+
+
+mongoose.connect('mongodb://localhost:27017/Tuiter');
 
 
 //express instance
@@ -80,6 +89,9 @@ const userController = UserController.getInstance(app);
 const tuitController = TuitController.getInstance(app);
 const dislikesDao = new DisLikeDao();
 const likeDao = new LikeDao();
+const likesController = LikeController.getInstance(app);
+const bookmarkDao = new BookmarkDao();
+const bookmarkController = new BookmarkController(app,bookmarkDao);
 const imageDao = new ImageDao();
 const followDao = new FollowDao();
 const tuitDao = TuitDao.getInstance();

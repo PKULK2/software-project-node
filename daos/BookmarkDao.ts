@@ -17,7 +17,7 @@ export default class BookmarkDao implements BookMarkDaoI {
      * @returns Promise To be notified when the bookmark is inserted in the
      * database
      */
-    createBookmark =  async (uid: string, tid: string): Promise<Bookmark> =>
+    createBookmark =  async (uid: string, tid: string): Promise<any> =>
         BookmarkModel.create({bookmarkedBy: uid, bookmarkedTuit: tid});
 
     /**
@@ -44,8 +44,12 @@ export default class BookmarkDao implements BookMarkDaoI {
      */
     findBookmarkByUser = async (uid: string): Promise<Bookmark[]> =>
         BookmarkModel.find({bookmarkedBy: uid})
-            .populate("bookmarkedBy")
-            .populate("bookmarkedTuit")
+            .populate({
+                path: "bookmarkedTuit",
+                populate: {
+                    path: "postedBy"
+                }
+            })
             .exec();
     /**
      * BookmarkModel to retrieve one instance of a bookmark tuit giving a particular user and a particular tuit
@@ -53,7 +57,7 @@ export default class BookmarkDao implements BookMarkDaoI {
      * @param {string} tid Tuit's primary key
      */
     findOneBookmark = async (uid: string, tid: string): Promise<any> =>
-        BookmarkModel.find({bookmarkedBy: uid, bookmarkedTuit: tid})
+        BookmarkModel.findOne({bookmarkedBy: uid, bookmarkedTuit: tid})
             .populate({
                 path: "bookmarkedTuit",
                 populate: {

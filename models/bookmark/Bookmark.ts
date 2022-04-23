@@ -3,5 +3,5 @@ import User from "../users/User";
 
 export default interface Bookmark {
     bookmarkedTuit: Tuit,
-    bookmarkedBy: User
+    bookmarkedBy: User,
 }
