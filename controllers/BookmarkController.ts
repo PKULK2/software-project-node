@@ -93,11 +93,6 @@ export default class BookmarkController implements BookmarkControllerI {
             .then(bookmark => res.json(bookmark));
     }
 
-    findBookmarkByUser = (req: Request, res: Response) =>
-        console.log(req.params.uid);
-        /*this.bookmarkDao.findBookmarkByUser(req.params.uid)
-            .then(bookmark => res.json(bookmark));*/
-
     /**
      * Retrieves all the bookmarked tuits stored in the bookmark collection from our database.
      * @param req {Request} req Represents request from client
