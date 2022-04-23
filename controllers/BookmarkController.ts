@@ -46,15 +46,23 @@ export default class BookmarkController implements BookmarkControllerI {
         const profile = req.session['profile'];
         const userId = uid === "me" && profile ?
             profile._id : uid;
+        console.log(userId)
         const bookmarkExists = await this.bookmarkDao.findOneBookmark(userId, tid);
         try {
             if (!bookmarkExists) {
                 this.bookmarkDao.createBookmark(userId, tid)
-                    .then(bookmark => res.json(bookmark));
+                    .then(bookmark => {
+                        res.json(bookmark)
+                    })
+                    .catch(e => {
+                        console.log(e)
+                        res.json(404)
+                    })
             }
-            res.sendStatus(200);
+            // res.sendStatus(200);
         }
         catch (e) {
+            //console.log(e)
             res.sendStatus(404);
         }
     }
@@ -74,11 +82,21 @@ export default class BookmarkController implements BookmarkControllerI {
      * @param res {Response} res Represents response to client, including the body formatted as JSON arrays
      * containing the bookmark objects
      */
+
+    findBookmarkByUser = (req: any, res: Response) => {
+        //console.log(req.params.uid);
+        const id = req.params.uid === 'me' ? req.session['profile']._id : req.params.uid
+        if(id === 'me') {
+            return res.sendStatus(404)
+        }
+        this.bookmarkDao.findBookmarkByUser(id)
+            .then(bookmark => res.json(bookmark));
+    }
+
     findBookmarkByUser = (req: Request, res: Response) =>
         console.log(req.params.uid);
         /*this.bookmarkDao.findBookmarkByUser(req.params.uid)
             .then(bookmark => res.json(bookmark));*/
-
     /**
      * Retrieves all the bookmarked tuits stored in the bookmark collection from our database.
      * @param req {Request} req Represents request from client
