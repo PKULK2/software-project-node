@@ -4,6 +4,7 @@
 import {Express, Request, Response} from "express";
 import FollowDao from "../daos/FollowDao";
 import FollowControllerI from "../interfaces/followController";
+import Follow from "../models/follow/Follow"
 
 /**
  * @class FollowController Implements RESTful Web service API for follow resource.
@@ -26,12 +27,12 @@ export default class FollowController implements FollowControllerI {
     constructor(app: Express, followDao: FollowDao) {
         this.app = app;
         this.followDao = followDao;
-        this.app.post("/users/:uid/follow/users/:fuid", this.createFollow);
-        this.app.delete("/users/:uid/unfollows/user/:fuid", this.deleteFollow);
-        this.app.get("/follows", this.findAllFollow);
-        this.app.get("/users/:uid/followers", this.findAllUsersFollowingThisUser);
-        this.app.get("/users/:uid/following", this.findAllUsersThisUserFollows);
-        this.app.get("/users/:uid/follow/users/:fuid", this.findOneFollow);
+        this.app.post("/api/users/:uid/follow/users/:fuid", this.createFollow);
+        this.app.delete("/api/users/:uid/unfollows/user/:fuid", this.deleteFollow);
+        this.app.get("/api/follows", this.findAllFollow);
+        this.app.get("/api/users/:uid/followers", this.findAllUsersFollowingThisUser);
+        this.app.get("/api/users/:uid/following", this.findAllUsersThisUserFollows);
+        this.app.get("/api/users/:uid/follow/users/:fuid", this.findOneFollow);
     }
 
     /**
@@ -42,21 +43,20 @@ export default class FollowController implements FollowControllerI {
      * as JSON containing the new follow that was inserted in the database
      */
     createFollow = async (req: any, res: any) => {
-        const uid = req.params.uid;
-        const fuid = req.params.fuid;
-        const profile = req.session['profile'];
-        const userId = uid === "me" && profile ?
-            profile._id : uid;
-        const existentFollow = await this.followDao.findOneFollow(uid, fuid);
+        let userId = req.params.uid === "me"
+        && req.session['profile'] ?
+            req.session['profile']._id :
+            req.params.uid;
+        const existentFollow = await this.followDao.findOneFollow(userId, req.params.fuid);
         try {
             if (!existentFollow) {
-                this.followDao.createFollow(uid, fuid)
+                this.followDao.createFollow(userId, req.params.fuid)
                     .then(follows => res.json(follows));
             }
-            res.sendStatus(200);
+            res.status(200);
         }
         catch (e) {
-            res.sendStatus(404)
+            res.status(404)
         }
     }
     /**
@@ -92,9 +92,14 @@ export default class FollowController implements FollowControllerI {
      * @param {Response} res Represents response to client including the
      * body formatted as JSON arrasys containing the follow object
      */
-    findAllUsersThisUserFollows = (req: Request, res: Response) =>
-        this.followDao.findAllUsersThisUserFollows(req.params.uid)
-            .then(follow => res.json(follow))
+    findAllUsersThisUserFollows = (req: any, res: any) => {
+        let userId = req.params.uid === "me"
+        && req.session['profile'] ?
+            req.session['profile']._id :
+            req.params.uid;
+        this.followDao.findAllUsersThisUserFollows(userId)
+            .then((follow: Follow[]) => res.json(follow));
+    }
     /**
      * Retrieves all this particular user follows from the database
      * @param {Request} req Represents request from client including the path
@@ -103,7 +108,12 @@ export default class FollowController implements FollowControllerI {
      * @param {Response} res Represents response to client including the
      * body formatted as JSON arrays containing the follow object
      */
-    findOneFollow = (req: Request, res: Response) =>
-        this.followDao.findOneFollow(req.params.uid, req.params.fuid)
-            .then(follow => res.json(follow))
+    findOneFollow = (req: any, res: any) => {
+        let userId = req.params.uid === "me"
+        && req.session['profile'] ?
+            req.session['profile']._id :
+            req.params.uid;
+        this.followDao.findOneFollow(userId, req.params.fuid)
+            .then(follow => res.json(follow));
+    }
 };

@@ -33,13 +33,13 @@ export default class ImageController implements ImageControllerI {
         const userId = uid === "me" && profile ?
             profile._id : uid;
         const followExist = await this.followDao.findOneFollow(uid, ruid);
-        if(followExist) {
+        //if(followExist) {
             this.upload.single('image');
             // @ts-ignore
             const image = {data: new Buffer.from(req.file.buffer, 'base64'), contentType: req.file.mimeType}
             const savedImage = await this.imageDao.createImage(userId, ruid, image)
             res.send(savedImage);
-        }
+       // }
     }
 
     deleteImage = async (req: Request, res: Response) =>
