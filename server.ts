@@ -39,7 +39,8 @@ const connection = "mongodb+srv://software-engineering:softwareSpring2022@cluste
 
 // connect to the database
 //mongoose.connect(connection);
-mongoose.connect('mongodb://localhost:27017/Tuiter');
+//mongoose.connect('mongodb://localhost:27017/Tuiter');
+mongoose.connect('mongodb+srv://PPK2000:Poorna-2000@cluster0.1murc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority');
 
 
 //express instance
