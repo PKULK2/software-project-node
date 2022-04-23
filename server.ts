@@ -6,7 +6,7 @@
  *     <li>tuits</li>
  *     <li>likes</li>
  * </ul>
- * 
+ *
  * Connects to a remote MongoDB instance hosted on the Atlas cloud database
  * service
  */
@@ -20,11 +20,15 @@ import ImageController from "./controllers/ImageController";
 import mongoose from "mongoose";
 import FollowDao from "./daos/FollowDao";
 import FollowController from "./controllers/FollowController";
+import AuthenticationController from "./controllers/AuthenticationController";
+import BookmarkController from "./controllers/BookmarkController";
+import BookmarkDao from "./daos/BookmarkDao";
 const cors = require('cors')
 const session = require("express-session");
 const multer = require('multer');
 
 // build the connection string
+/*
 const PROTOCOL = "mongodb+srv";
 const DB_USERNAME = process.env.DB_USERNAME;
 const DB_PASSWORD = process.env.DB_PASSWORD;
@@ -33,9 +37,14 @@ const DB_NAME = "myFirstDatabase";
 const DB_QUERY = "retryWrites=true&w=majority";
 const connectionString = `${PROTOCOL}://${DB_USERNAME}:${DB_PASSWORD}@${HOST}/${DB_NAME}?${DB_QUERY}`;
 const connection = "mongodb+srv://software-engineering:softwareSpring2022@cluster0.exbec.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+*/
 
 // connect to the database
-mongoose.connect(connection);
+//mongoose.connect(connection);
+//mongoose.connect('mongodb://localhost:27017/Tuiter');
+mongoose.connect('mongodb+srv://PPK2000:Poorna-2000@cluster0.1murc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority');
+
+
 
 //express instance
 const app = express();
@@ -81,10 +90,13 @@ const courseController = new CourseController(app);
 const userController = UserController.getInstance(app);
 const tuitController = TuitController.getInstance(app);
 const likesController = LikeController.getInstance(app);
+const bookmarkDao = new BookmarkDao();
+const bookmarkController = new BookmarkController(app,bookmarkDao);
 const imageDao = new ImageDao();
 const followDao = new FollowDao();
 const followController = new FollowController(app, followDao);
 const imageController = new ImageController(app, imageDao, followDao, upload);
+AuthenticationController(app);
 
 
 /**
