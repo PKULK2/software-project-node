@@ -59,12 +59,12 @@ export default class BookmarkController implements BookmarkControllerI {
                         res.json(404)
                     })
             }
-            // res.sendStatus(200);
         }
         catch (e) {
-            //console.log(e)
-            res.sendStatus(404);
+            res.send(404);
+            // res.sendStatus(200);
         }
+     
     }
     /**
      * Deletes a bookmark object that contains the bookmark tuit
@@ -97,6 +97,7 @@ export default class BookmarkController implements BookmarkControllerI {
         console.log(req.params.uid);
         /*this.bookmarkDao.findBookmarkByUser(req.params.uid)
             .then(bookmark => res.json(bookmark));*/
+
     /**
      * Retrieves all the bookmarked tuits stored in the bookmark collection from our database.
      * @param req {Request} req Represents request from client
