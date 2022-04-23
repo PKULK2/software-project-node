@@ -37,11 +37,6 @@ export default class ImageDao implements ImageDaoI {
      * @returns Promise to be notified when the images are retrieve from database
      */
     findImagesByUser = async (uid: string, ruid: string): Promise<Image[]> => {
-        console.log("THIS IS FROM IMAGES BY USER")
-        console.log("UID")
-        console.log(uid)
-        console.log("RUID")
-        console.log(ruid)
         return ImageModel.find({sender: ruid, receiver: uid})
             .sort({'postedOn': -1})
             .populate({
@@ -58,11 +53,6 @@ export default class ImageDao implements ImageDaoI {
      * @returns Promise to be notified when the images are retrieve from database
      */
     findImagesToUser = async (uid: string, ruid: string): Promise<Image[]> => {
-        console.log("THIS IS FROM IMAGES TO USER")
-        console.log("UID")
-        console.log(uid)
-        console.log("RUID")
-        console.log(ruid)
         return ImageModel.find({receiver: ruid, sender: uid})
             .sort({'postedOn': -1})
             .populate({
