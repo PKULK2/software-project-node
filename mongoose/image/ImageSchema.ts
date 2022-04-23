@@ -1,13 +1,14 @@
 import mongoose, {Schema} from "mongoose";
 import Image from "../../models/image/Image";
+import moment from "moment";
 
 const ImageSchema = new mongoose.Schema<Image>({
     sender: {type: Schema.Types.ObjectId, ref: "UserModel"},
     receiver: {type: Schema.Types.ObjectId, ref: "UserModel"},
-    image: {
-        data: Buffer,
-        contentType: String,
-    },
-    sentOn: {type: Date, default: Date.now()}
+    image: {type: String},
+    sentOn: {type: String, default: function () {
+            return moment().format("YYYY-MM-DD hh:mm:ss")
+        }
+    }
 }, {collection: "images"})
 export default ImageSchema;

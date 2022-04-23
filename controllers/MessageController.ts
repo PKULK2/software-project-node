@@ -7,18 +7,19 @@ import FollowDao from "../daos/FollowDao";
 import MessageControllerI from "../interfaces/messageController";
 
 /**
- * @class MessageDao Implements RESTful Web service API for message resource.
+ * @class MessageController Implements RESTful Web service API for message resource.
  * Defines the following HTTP endpoints:
  * <ul>
- *     <li>POST /users/:uid/tuits/:tid to create a new bookmark instance for a given tuit</li>
- *     <li>DELETE /users/:uid/tuits/:tid to remove a particular bookmark instance</li>
- *     <li>GET /users/:uid/tuits to retrieve all the tuit bookmark instances by user</li>
- *     <li>GET /users/tuits to retrieve all of the bookmark instances</li>
- *     <li>GET /users/:uid/tuits/:tid to retrieve one bookmark instance</li>
+ *     <li>POST /api/users/:uid/message/users/:ruid to create a new message instance for a given tuit</li>
+ *     <li>DELETE /api/users/message/:mid/users/:ruid to remove a particular message instance</li>
+ *     <li>GET /api/users/:uid/user/messages/:ruid to retrieve all the messages instances sent by user to another</li>
+ *     <li>GET /api/users/:uid/messages/user/:ruid to retrieve all of the messages instances sent to a user by another</li>
+ *     <li>GET /api/users/ to retrieve all messages instances in the database</li>
+ *     <li>PUT /api/user/:uid/update/message/users/:ruid to update a message instance </li>
  * </ul>
- * @property {BookmarkDao} bookmarkDao DAO implementing follow CRUD operations
- * @property {BookmarkController} bookmarkController controller implementing
- * RESTful Web service API
+ * @property {app} Express instance
+ * @property {MessageDao} messageDao DAO implementing message CRUD operations
+ * @property {FollowDao} followDao DAO implementing follow CRUD operations
  */
 export default class MessageController implements MessageControllerI {
     app: Express;
@@ -30,18 +31,18 @@ export default class MessageController implements MessageControllerI {
         this.followDao = followDao;
         this.app.post("/api/users/:uid/message/users/:ruid", this.createMessage);
         this.app.delete("/api/users/:uid/message/:mid/users/:ruid", this.deleteMessage);
-        this.app.get("/api/users/:uid/user/messages", this.findMessagesByUser);
-        this.app.get("/api/users/:uid/messages/user", this.findMessagesToUser);
+        this.app.get("/api/users/:uid/user/messages/:ruid", this.findMessagesByUser);
+        this.app.get("/api/users/:uid/messages/user/:ruid", this.findMessagesToUser);
         this.app.get("/api/messages", this.findAllMessages);
         this.app.put("/api/users/:uid/update/message/users/:ruid", this.updateMessage);
     }
 
     /**
-     * Creates a bookmark object to be sent to database collection
+     * Creates a message object to be sent to database collection
      * @param {Request} req represents request from client including body
-     * containing the JSON object for the new bookmark to be inserted in the database
+     * containing the JSON object for the new message to be inserted in the database
      * @param {Response} res represents response to client, including the body formatted
-     * as JSON containing the new bookmark that was inserted in the database
+     * as JSON containing the new message that was inserted in the database
      */
     createMessage = async (req: any, res: any) => {
         const uid = req.params.uid;
@@ -55,17 +56,13 @@ export default class MessageController implements MessageControllerI {
                 this.messageDao.createMessage(userId, ruid, req.body.message)
                     .then(message => res.json(message));
             }
-            else {
-                //pass
-            }
-            res.sendStatus(200);
         }
         catch (e) {
-            res.sendStatus(404);
+            res.send(404);
         }
     }
     /**
-     * Deletes a bookmark object that contains the bookmarked tuit
+     * Deletes a message object that contains the bookmarked tuit
      * @param {Request} req represents request from client including the
      * path parameters uid and ruid representing the sender user and the receiver user
      * primary's key
@@ -80,11 +77,16 @@ export default class MessageController implements MessageControllerI {
      * @param {Request} req represents request from client including the path parameter uid
      * representing the user's primary's key
      * @param {Response} res represents response to client, including the body formatted as JSON containing
-     * the follow object
+     * the message object
      */
-    findMessagesByUser = (req: Request, res: Response) =>
-        this.messageDao.findMessagesByUser(req.params.uid)
-            .then(follows => res.json(follows));
+    findMessagesByUser = (req: any, res: any) => {
+        let userId = req.params.ruid === "me"
+        && req.session['profile'] ?
+            req.session['profile']._id :
+            req.params.uid;
+        this.messageDao.findMessagesByUser(userId, req.params.uid)
+            .then(message => res.json(message));
+    }
     /**
      * Retrieves all messages sent to a particular user
      * @param {Request} req represents request from client including the path parameter uid
@@ -92,9 +94,14 @@ export default class MessageController implements MessageControllerI {
      * @param {Response} res represents response from client including the body formatted as JSON containing
      * the message object
      */
-    findMessagesToUser = (req: Request, res: Response) =>
-        this.messageDao.findMessagesToUser(req.params.uid)
-            .then(status => res.send(status));
+    findMessagesToUser = (req: any, res: any) => {
+        let userId = req.params.uid === "me"
+        && req.session['profile'] ?
+            req.session['profile']._id :
+            req.params.uid;
+        this.messageDao.findMessagesToUser(userId, req.params.ruid)
+            .then(message => res.send(message));
+    }
     /**
      * Retrieves all messages stored in the database collection
      * @param {Request} req represents request from client

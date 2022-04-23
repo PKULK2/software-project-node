@@ -13,57 +13,73 @@ import Image from "../models/image/Image";
  */
 export default class ImageDao implements ImageDaoI {
     /**
-     * Uses ImageFollow to insert new values in the message collection
-     * @returns Promise To be notified when the message is inserted in the
+     * Uses ImageModel to insert new values in the images collection
+     * @returns Promise To be notified when the image is inserted in the
      * database
      */
-    createImage = async (uid: string, ruid: string, image: any): Promise<Image> =>
+    createImage = async (uid: string, ruid: string, image: string): Promise<Image> =>
         ImageModel.create({sender: uid, receiver: ruid, image: image});
 
     /**
-     * MessageModel to remove a message instance from the database.
-     * @param {string} uid Primary key of user that sent message
-     * @param {string} ruid Primary key of the receiver's message to be removed
-     * @param {string} iid Primary key of the message itself
-     * @returns Promise To be notified when message instance is removed from the database
+     * ImageModel to remove a Image instance from the database.
+     * @param {string} uid Primary key of user that sent image
+     * @param {string} ruid Primary key of the receiver's image to be removed
+     * @param {string} iid Primary key of the image itself
+     * @returns Promise To be notified when image instance is removed from the database
      */
     deleteImage =  async (uid: string, ruid: string, iid: string): Promise<any> =>
         ImageModel.deleteOne({sender: uid, receiver: ruid, _id: iid});
 
-    // @ts-ignore
     /**
-     * MessageModel to retrieve all messages sent by this user
+     * ImageModel to retrieve all Images sent by this user
      * @param {string} uid User's primary key
-     * @returns Promise to be notified when the messages are retrieve from database
+     * @param {ruid} ruid the Receiver's primary key
+     * @returns Promise to be notified when the images are retrieve from database
      */
-    findImagesByUser = async (uid: string): Promise<Image[]> =>
-        ImageModel.find({sender: uid})
+    findImagesByUser = async (uid: string, ruid: string): Promise<Image[]> => {
+        console.log("THIS IS FROM IMAGES BY USER")
+        console.log("UID")
+        console.log(uid)
+        console.log("RUID")
+        console.log(ruid)
+        return ImageModel.find({sender: ruid, receiver: uid})
             .sort({'postedOn': -1})
-            .populate("receiver")
-            .lean()
+            .populate({
+                path: "sender",
+                select: "username"
+            })
             .exec();
+    }
 
     /**
-     * MessageModel to retrieve all messages sent to this user
+     * ImageModel to retrieve all messages sent to this user
      * @param {string} uid User's primary key
-     * @returns Promise to be notified when the messages are retrieve from database
+     * @param {ruid} ruid the Receiver's primary key
+     * @returns Promise to be notified when the images are retrieve from database
      */
-    findImagesToUser = async (uid: string): Promise<Image[]> =>
-        ImageModel.find({receiver: uid})
+    findImagesToUser = async (uid: string, ruid: string): Promise<Image[]> => {
+        console.log("THIS IS FROM IMAGES TO USER")
+        console.log("UID")
+        console.log(uid)
+        console.log("RUID")
+        console.log(ruid)
+        return ImageModel.find({receiver: ruid, sender: uid})
             .sort({'postedOn': -1})
-            .lean()
-            .populate("sender")
+            .populate({
+                path: "receiver",
+                select: "username"
+            })
             .exec();
+    }
 
     /**
-     * MessageModel to retrieve all Messages stored in the message collection
+     * ImageModel to retrieve all Images stored in the message collection
      * @returns Promise to be notified when the follows are retrieve from database
      */
     findAllImages = async (): Promise<Image[]> =>
         ImageModel.find()
             .populate("sender")
             .populate("receiver")
-            .lean()
             .exec();
 
 }
